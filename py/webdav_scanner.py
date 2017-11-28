@@ -1,4 +1,4 @@
-#!/user/bin/python2.7
+#!/usr/bin/env python2.7
 
 # Author: m8r0wn
 # Script: webdav_scanner.py
@@ -105,11 +105,17 @@ def scan(t, port, v):
         sys.stdout.flush()
         x = resp.splitlines()[0]
         # pull http code for summary
-        if "200" in x or "207" in x:
-            sys.stdout.write("[+] WebDav Enabled: %s (Code: %s)\n" % (t, x.split(" ")[1]))
+        if "207" in x:
+            srv_count = 0
+            for y in resp.splitlines():
+                if srv_count == 1: break
+                if 'Server:' in y:
+                    sys.stdout.write("[+] WebDav Enabled: %s (Code: %s %s)\n" % (t, x.split(" ")[1], y))
+                    srv_count += 1
+            if srv_count != 1:
+                print sys.stdout.write("[+] WebDav Enabled: %s (Code: %s Server: N/A)\n" % (t, x.split(" ")[1]))
         else:
             sys.stdout.write("[-] WebDav Disabled: %s (Code: %s)\n" % (t, x.split(" ")[1]))
-
         sock.close()
     except KeyboardInterrupt:
         sock.close()
